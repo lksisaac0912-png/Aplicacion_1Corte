@@ -191,3 +191,40 @@ st.sidebar.markdown(
 )
 
 st.caption("App generada para análisis exploratorio. Ajusta nombres de columnas si tu CSV usa etiquetas distintas (ej. 'Cement' en vez de 'cement').")
+import streamlit as st
+import pandas as pd
+
+st.markdown("## 🧹 Manejo de valores nulos")
+
+if uploaded_file is not None:
+    df = pd.read_excel(uploaded_file)
+
+    # Mostrar cantidad de nulos
+    st.write("### Valores nulos por columna:")
+    st.dataframe(df.isnull().sum())
+
+    # Opción de tratamiento
+    opcion = st.radio(
+        "Selecciona una estrategia para manejar nulos:",
+        ("No hacer nada", "Eliminar filas con nulos", "Rellenar con media", "Rellenar con mediana", "Rellenar con moda")
+    )
+
+    if opcion == "Eliminar filas con nulos":
+        df = df.dropna()
+        st.success("✅ Se eliminaron las filas con valores nulos.")
+
+    elif opcion == "Rellenar con media":
+        df = df.fillna(df.mean(numeric_only=True))
+        st.success("✅ Los valores nulos fueron reemplazados con la media.")
+
+    elif opcion == "Rellenar con mediana":
+        df = df.fillna(df.median(numeric_only=True))
+        st.success("✅ Los valores nulos fueron reemplazados con la mediana.")
+
+    elif opcion == "Rellenar con moda":
+        df = df.fillna(df.mode().iloc[0])
+        st.success("✅ Los valores nulos fueron reemplazados con la moda.")
+
+    # Mostrar DataFrame limpio
+    st.write("### DataFrame después del tratamiento de nulos:")
+    st.dataframe(df.head())
